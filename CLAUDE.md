@@ -39,8 +39,9 @@ Lives in the matter's Google Tasks list — never in this repo
 SIN.** The operator's files live outside it:
 
 Everything lives in **Google Drive**, synced by Drive for Desktop. The operator points
-`$LEDGER_DRIVE_DIR` at the finance folder in Drive (and may symlink `~/.local/share/ledger`
-to its `Ledger/`); no Drive path is written into this repo.
+`$LEDGER_DRIVE_DIR` at the finance folder in Drive, in the gitignored `.envrc.local` that
+the committed `.envrc` sources (direnv; run `direnv allow` once), and may symlink
+`~/.local/share/ledger` to its `Ledger/`; no Drive path is written into this repo.
 
 | What | Where |
 |---|---|
