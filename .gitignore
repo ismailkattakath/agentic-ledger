@@ -1,0 +1,33 @@
+# Secrets — never committed
+.env
+.env.*
+!.env.example
+.envrc.local
+!.envrc
+
+# Operator data lives OUTSIDE this repo (CLAUDE.md § Where the data lives).
+# These patterns are a backstop, not the protection.
+*.pdf
+*.jpg
+*.jpeg
+*.png
+*.qfx
+*.ofx
+*.qbo
+*.csv
+*.beancount
+*.bean
+*.jsonl
+ledger.toml
+accounts.toml
+statements/
+documents/
+
+# Nix / direnv / tooling
+result
+result-*
+/.direnv/
+__pycache__/
+.DS_Store
+.claude/settings.local.json
+.claude/state/

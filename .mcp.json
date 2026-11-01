@@ -1,0 +1,4 @@
+{
+  "_comment": "Deliberately empty of servers — ADR-0001. Everything this project uses is user scope (the built-in browser pane, the Gmail and Drive connectors) or an already-enabled plugin (page-lab, google-workspace-mcp, android-phone). Declaring copies here would create a second pin to drift. Add a server only with an ADR entry and a matching line in .claude/settings.json.",
+  "mcpServers": {}
+}
