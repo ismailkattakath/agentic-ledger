@@ -41,6 +41,7 @@ Summary per source on stderr.
     uv run --script link_sources.py --sources src.json --ledger ledger.json \\
         --payee <SOURCE>=<REGEX> --out links.json
 """
+
 import argparse
 import collections
 import datetime as dt
@@ -58,7 +59,9 @@ def money(v):
 
 
 def main():
-    ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    ap = argparse.ArgumentParser(
+        description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter
+    )
     ap.add_argument("--sources", required=True)
     ap.add_argument("--ledger", required=True)
     ap.add_argument("--payee", action="append", default=[], help="SOURCE=REGEX")
@@ -76,13 +79,29 @@ def main():
     sources = json.load(open(a.sources, encoding="utf-8"))
     ledger = []
     for i, r in enumerate(json.load(open(a.ledger, encoding="utf-8"))):
-        if len(r) == 12:   # beancount-kit build --emit-rows: columns A-L, no row number
-            ledger.append(dict(row=i, date=day(r[0]), amt=money(r[1]), text=f"{r[2]} {r[3]}",
-                               key=r[8], cur=r[11] or "CAD"))
+        if len(r) == 12:  # beancount-kit build --emit-rows: columns A-L, no row number
+            ledger.append(
+                dict(
+                    row=i,
+                    date=day(r[0]),
+                    amt=money(r[1]),
+                    text=f"{r[2]} {r[3]}",
+                    key=r[8],
+                    cur=r[11] or "CAD",
+                )
+            )
             continue
         r = list(r) + [""] * (10 - len(r))
-        ledger.append(dict(row=int(r[0]), date=day(r[1]), amt=money(r[2]), text=f"{r[3]} {r[4]}",
-                           key=r[8], cur=r[9] or "CAD"))
+        ledger.append(
+            dict(
+                row=int(r[0]),
+                date=day(r[1]),
+                amt=money(r[2]),
+                text=f"{r[3]} {r[4]}",
+                key=r[8],
+                cur=r[9] or "CAD",
+            )
+        )
 
     cands = []
     for si, s in enumerate(sources):
@@ -90,9 +109,15 @@ def main():
         if rx is None:
             continue
         sd = day(s["date"])
-        charges = [(0, float(s["charge"]))] + [(1, float(x)) for x in s.get("alt") or []]
+        charges = [(0, float(s["charge"]))] + [
+            (1, float(x)) for x in s.get("alt") or []
+        ]
         for li, l in enumerate(ledger):
-            if l["amt"] >= 0 or l["cur"] != s.get("currency", "CAD") or not rx.search(l["text"]):
+            if (
+                l["amt"] >= 0
+                or l["cur"] != s.get("currency", "CAD")
+                or not rx.search(l["text"])
+            ):
                 continue
             dd = (l["date"] - sd).days
             if not lo <= dd <= hi:
@@ -110,7 +135,11 @@ def main():
         if si in s_link or li in l_used or si in ambiguous:
             remaining = remaining[1:]
             continue
-        live = [c for c in remaining if c[1] not in s_link and c[1] not in ambiguous and c[2] not in l_used]
+        live = [
+            c
+            for c in remaining
+            if c[1] not in s_link and c[1] not in ambiguous and c[2] not in l_used
+        ]
         same_s = {c[2] for c in live if c[1] == si and c[0] == score}
         same_l = {c[1] for c in live if c[2] == li and c[0] == score}
         if len(same_s) > 1:
@@ -120,16 +149,30 @@ def main():
         else:
             s_link[si] = (li, score)
             l_used.add(li)
-        remaining = [c for c in remaining[1:] if c[1] not in s_link and c[1] not in ambiguous and c[2] not in l_used]
+        remaining = [
+            c
+            for c in remaining[1:]
+            if c[1] not in s_link and c[1] not in ambiguous and c[2] not in l_used
+        ]
 
     out, summary = [], collections.defaultdict(collections.Counter)
     for si, s in enumerate(sources):
-        rec = dict(source=s["source"], id=s["id"], key="", row="", method="", confidence="no match")
+        rec = dict(
+            source=s["source"],
+            id=s["id"],
+            key="",
+            row="",
+            method="",
+            confidence="no match",
+        )
         if si in s_link:
             li, (is_alt, gap) = s_link[si]
-            rec.update(key=ledger[li]["key"], row=ledger[li]["row"],
-                       method="alt-charge+date+payee" if is_alt else "charge+date+payee",
-                       confidence="high" if not is_alt and gap <= 2 else "medium")
+            rec.update(
+                key=ledger[li]["key"],
+                row=ledger[li]["row"],
+                method="alt-charge+date+payee" if is_alt else "charge+date+payee",
+                confidence="high" if not is_alt and gap <= 2 else "medium",
+            )
         elif si in ambiguous:
             rec["confidence"] = "ambiguous"
         out.append(rec)
@@ -144,8 +187,11 @@ def main():
     else:
         print(text)
     for src, c in sorted(summary.items()):
-        print(f"{src}: {sum(c.values())} records  " + "  ".join(f"{k} {v}" for k, v in sorted(c.items())),
-              file=sys.stderr)
+        print(
+            f"{src}: {sum(c.values())} records  "
+            + "  ".join(f"{k} {v}" for k, v in sorted(c.items())),
+            file=sys.stderr,
+        )
 
 
 if __name__ == "__main__":

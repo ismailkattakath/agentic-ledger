@@ -64,8 +64,9 @@ never lives here in the first place. A `.gitignore` cannot protect a path outsid
 
 ## Commands
 
-No build, no toolchain, no flake. This repo is procedures; the tools it names are already
-on PATH. ADR-0001 says why there is no `nix develop` here when agentic-nomad has one.
+`nix develop` (or direnv's `use flake`) gives poppler, python3, uv, gh and git; `nix flake
+check` runs formatting, toolchain-complete and an offline project-gate. Beancount and Fava
+stay with the `beancount` plugin's pin — the flake header says why.
 
 ```bash
 pdfinfo F.pdf | awk '/^Pages:/{print $2}'             # page count

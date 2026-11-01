@@ -35,14 +35,20 @@ own.** Its value is the rules, the skills and the permissions, not a new stack.
 
 ## Deliberately NOT copied from agentic-nomad
 
-Sibling-project envy is how a second copy gets born. Three things were left out on purpose.
+Sibling-project envy is how a second copy gets born. Two things were left out on purpose; a
+third (the flake) was later adopted.
 
 | Not copied | Why |
 |---|---|
 | **`hostpolicy.py` + `hosts.json`** | That allowlist exists to gate where `fill-secret.mjs` may **fill a credential into a page**. This project never fills one — `rules/read-only-banking.md` forbids it and the operator authenticates every portal himself. A host allowlist with no filling to gate is ceremony, and a second copy of the code to drift |
 | **`page_scope.py`** | Its matcher is `^mcp__plugin_page-lab_chrome-devtools__.*`. This project's reads go through `mcp__Claude_Browser__*`, so a straight copy would **redact nothing**. Redaction here is a discipline in `rules/identity-data-handling.md`, not a hook — honestly weaker, and recorded as such |
-| **`flake.nix`** | agentic-nomad's flake pins a toolchain and runs hook tests. There is no code here and no hooks, and poppler is already on PATH. A flake would be a lockfile to maintain for nothing |
 
-**Revisit the middle one** if this project ever reads a portal through page-lab routinely, or
+**`flake.nix` — adopted 2026-11-01**, reversing the original "a lockfile for nothing" call.
+The operator chose one shape for all three `agentic-*` repos. A public repo's skills shell out
+to poppler, python3 and uv; the devShell gives a contributor those without the fleet, and
+`toolchain-complete` proves the list resolves. Beancount and Fava are deliberately NOT in it
+(ADR-0004's single installer).
+
+**Revisit `page_scope.py`** if this project ever reads a portal through page-lab routinely, or
 if the volume of account numbers crossing the transcript makes a mechanical redactor worth
 the second copy.
